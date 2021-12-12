@@ -50,16 +50,18 @@ def haley_tts(_Text: str = None):
     import os
     if _Text is None: 
         return "유효하지 않은 값 입니다."
+
     _Number = random.randint(1,99999)
+    _FileName = f'tts_data/{_Number}.mp3'
+    
     tts = gTTS(text = _Text, lang = 'ko')
-    _FileName = f'./tts_data/{_Number}.mp3'
     try:
         tts.save(_FileName)
     except:
         return "에러가 발생 했습니다."
-    cwd = os.getcwd()
-    print(cwd)
-    playsound('tts.mp3')
+    global_file_path = os.path.abspath(_FileName)
+    playsound(global_file_path)
+    
     if os.path.isfile(_FileName):
         os.remove(_FileName)
 
