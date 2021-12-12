@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json, random, os
+from gtts.tts import gTTSError
 import speech_recognition as sr
-from playsound import playsound
 from bs4 import BeautifulSoup as bs
 
 os.system('cls')
@@ -50,20 +50,29 @@ def haley_tts(_Text: str = None):
     import os
     if _Text is None: 
         return "유효하지 않은 값 입니다."
+    
+    cached, file_name = is_cached_and_hash_code(_Text)
+    if not cached:
+        tts = gTTS(text = _Text, lang = 'ko')
+        try:
+            tts.save(file_name)
+        except gTTSError.infer_msg as e:
+            print(e)
+            return
 
-    _Number = random.randint(1,99999)
-    _FileName = f'tts_data/{_Number}.mp3'
-    
-    tts = gTTS(text = _Text, lang = 'ko')
-    try:
-        tts.save(_FileName)
-    except:
-        return "에러가 발생 했습니다."
-    global_file_path = os.path.abspath(_FileName)
+    global_file_path = os.path.abspath(file_name)
     playsound(global_file_path)
-    
+
+def is_cached_and_hash_code(_Text: str) -> tuple[bool, str]:
+    import hashlib
+    hash_object = hashlib.sha1()
+    hash_object.update(_Text.encode())
+    hash_hex = hash_object.hexdigest().encode()
+    _FileName = f'tts_data/{hash_hex}.mp3'
+
     if os.path.isfile(_FileName):
-        os.remove(_FileName)
+        return (True, _FileName)
+    return (False, _FileName)
 
 def main():
     # haley_tts("HelloWorld")
